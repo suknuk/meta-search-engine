@@ -44,10 +44,35 @@ Installation
 ------------
 [installation]: #installation
 
-
+ - Install apache and PHP as mentioned in [this guide][install-apache].  
+   Under Ubuntu, do this:
+   ```
+   sudo apt-get update
+   sudo apt-get -y install apache2
+   ```
+   Check that http://localhost returns a webpage.
+   ```
+   sudo apt-get -y install php libapache2-mod-php
+   ```
+ - Get this repository.  
+   You can download the sources or clone it usig git.
+   ```
+   git clone https://github.com/schul-cloud/meta-search-engine.git
+   cd meta-search-engine
+   pwd # /path/to/meta-search-engine
+   ```
+ - Create a symlink to your location from for http://localhost/v1/search  
+   Therefore you need the path from pwd.
+   ```
+   sudo mkdir -p /var/www/html/v1
+   sudo ln -sT /path/to/meta-search-engine/src /var/www/html/v1/search
+   ```
+   
+   
 
 
 
 
 
 [issue]: https://github.com/schul-cloud/schulcloud-content/issues/2
+[install-apache]: http://www.allaboutlinux.eu/how-to-run-php-on-ubuntu/
