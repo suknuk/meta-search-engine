@@ -61,14 +61,13 @@ Installation
    cd meta-search-engine
    pwd # /path/to/meta-search-engine
    ```
- - Create a symlink to your location from for http://localhost/v1/search  
+ - Create a symlink to your location for http://localhost/v1/search  
    Therefore you need the path from pwd.
    ```
    sudo mkdir -p /var/www/html/v1
    sudo ln -sT /path/to/meta-search-engine/src /var/www/html/v1/search
    ```
-   
-   
+   Now, you should be able to access http://localhost/v1/search
 
 
 
