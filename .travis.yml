@@ -14,4 +14,5 @@ before_script:
   - pip3 install --user schul_cloud_search_tests
 
 script:
+  - "curl -i -H 'User-Agent: python-requests/2.18.1' -H 'Accept-Encoding: gzip, deflate' -H 'Host: localhost:37325' -H 'Accept: */*' 'http://localhost/v1/search/?Q=test'"
   - "python3 -m schul_cloud_search_tests.search --url=http://localhost/v1/search/"
