@@ -10,7 +10,7 @@ before_script:
   - sudo ln -sT "`pwd`/src" /var/www/html/v1/search
   # install packages
   - sudo apt-get update -qq
-  - sudo apt-get install -y -qq python3 python3-pip apache2
+  - sudo apt-get install -y -qq python3 python3-pip apache2 libapache2-mod-php
   - pip3 install --user schul_cloud_search_tests
 
 script:
