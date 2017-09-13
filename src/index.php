@@ -28,6 +28,8 @@ if (isset($_SERVER['HTTP_ACCEPT'])) {
   error_log("Accept header not set");
 }
 
+$parameters_are_valid = isset($_GET['Q']) && count($_GET) == 1;
+
 if (!$content_type_is_acceptable) {
   # we can not serve this content type
   $response = array(
@@ -42,8 +44,23 @@ if (!$content_type_is_acceptable) {
   );
   http_response_code(406);
   echo json_encode($response);
+} else if (!$parameters_are_valid) {
+  # we can not serve this request with invalid parameters
+  $response = array(
+    'jsonapi' => $JSONAPI,
+    'errors' => array(
+      array(
+        'status' => '400',
+        'title' => 'Bad Request',
+        'detail' => 'Currently, only the "Q" parameter is supported.'
+      )
+    )
+  );
+  http_response_code(400);
+  echo json_encode($response);
 } else {
   # This is a proper response
+  $Q = $_GET['Q'];
   
   if (isset($_SERVER['HTTP_HOST'])) {
     $host = $_SERVER['HTTP_HOST'];
@@ -55,7 +72,7 @@ if (!$content_type_is_acceptable) {
     'jsonapi' => $JSONAPI,
     'links' => array(
       'self' => array(
-        'href' => 'http://'.$host.'/v1/search/',
+        'href' => 'http://'.$host.'/v1/search/?Q='.$Q,
         'meta' => array(
           'count' => 0,
           'limit' => 10,
