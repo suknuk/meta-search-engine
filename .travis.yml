@@ -5,11 +5,13 @@ php:
   - '7.0'
 
 before_script:
+  # install current search engine
+  - sudo mkdir -p /var/www/html/v1
+  - sudo ln -sT "`pwd`/src" /var/www/html/v1/search
+  # install packages
   - sudo apt-get update -qq
   - sudo apt-get install -y -qq python3 python3-pip apache2
   - pip3 install --user schul_cloud_search_tests
-  - sudo mkdir -p /var/www/html/v1
-  - sudo ln -sT "`pwd`/src" /var/www/html/v1/search
 
 script:
   - "python3 -m schul_cloud_search_tests.search --url=http://localhost/v1/search/"
