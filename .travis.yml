@@ -10,7 +10,13 @@ before_script:
   # install current search engine
   - sudo mkdir -p /var/www/html/v1
   - sudo ln -sT "`pwd`/src" /var/www/html/v1/search
+  # restart apache
+  - sudo service apache2 restart
 
 script:
   - "curl -i -H 'User-Agent: python-requests/2.18.1' -H 'Accept-Encoding: gzip, deflate' -H 'Host: localhost:37325' -H 'Accept: */*' 'http://localhost/v1/search/?Q=test'"
   - "python3 -m schul_cloud_search_tests.search --url=http://localhost/v1/search/"
+
+after_failure:
+  - cat /var/log/apache2/access.log
+  - cat /var/log/apache2/error.log
