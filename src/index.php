@@ -12,8 +12,9 @@ $JSONAPI = array(
   )
 );
 
-if (isset($_SERVER['Accept'])) {
-  $accepted_content_types = explode('.', $string);
+if (isset($_SERVER['HTTP_ACCEPT'])) {
+  error_log("Accept header set to ".$_SERVER['HTTP_ACCEPT']);
+  $accepted_content_types = explode(',', $_SERVER['HTTP_ACCEPT']);
   $served_content_types = array('*/*', 'application/*', 'application/vnd.api+json');
   $content_type_is_acceptable = false;
   foreach ($accepted_content_types as $accepted_content_type) {
@@ -24,6 +25,7 @@ if (isset($_SERVER['Accept'])) {
   }
 } else {
   $content_type_is_acceptable = false;
+  error_log("Accept header not set");
 }
 
 if (!$content_type_is_acceptable) {
@@ -42,11 +44,18 @@ if (!$content_type_is_acceptable) {
   echo json_encode($response);
 } else {
   # This is a proper response
+  
+  if (isset($_SERVER['HTTP_HOST'])) {
+    $host = $_SERVER['HTTP_HOST'];
+  } else {
+    $host = 'localhost';
+  }
+  
   $response = array(
     'jsonapi' => $JSONAPI,
     'links' => array(
       'self' => array(
-        'href' => 'http://'.$_SERVER['HOST'].'/v1/search/',
+        'href' => 'http://'.$host.'/v1/search/',
         'meta' => array(
           'count' => 0,
           'limit' => 10,
@@ -63,5 +72,7 @@ if (!$content_type_is_acceptable) {
   echo json_encode($response);
 }
 
+# finish the response
+echo "\r\n";
 flush();
 ?>
