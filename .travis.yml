@@ -18,5 +18,5 @@ script:
   - "python3 -m schul_cloud_search_tests.search --url=http://localhost/v1/search/"
 
 after_failure:
-  - cat /var/log/apache2/access.log
-  - cat /var/log/apache2/error.log
+  - sudo cat /var/log/apache2/access.log
+  - sudo cat /var/log/apache2/error.log
