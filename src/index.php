@@ -4,7 +4,8 @@
 # You can find the whole source code here:
 #    https://github.com/schul-cloud/meta-search-engine
 #
-#
+# The configuration for search engines can be found here in
+# ./search-engines.txt
 
 $SERVER_NAME = 'schul-cloud-meta-search-engine';
 $SEARCH_QUERY_PARAMETER_START = 'Search';
@@ -38,13 +39,18 @@ if (isset($_SERVER['HTTP_ACCEPT'])) {
   error_log("Accept header not set");
 }
 
+# get the default search engines to request
+$additional_search_engine_configuration = file_get_contents('./search-engines.txt');
+$requested_search_engines = preg_split ('/$\R?^/m', $additional_search_engine_configuration); # https://stackoverflow.com/a/7498886/1320237
+
 # find out if the request parameters are valid are usable
 $parameters_are_valid = isset($_GET['Q']);
 $invalid_parameter_message = 'You can use the "Search" parameter to set the search engines to request. ';
 if (!$parameters_are_valid) {
   $invalid_parameter_message = $invalid_parameter_message.'Parameter "Q" must be set. ';
 }
-$requested_search_engines = array();
+
+# parse the request parameters
 foreach ($_GET as $key => $value) {
   if ($key == 'Q') {
     # Q parameter is supported as is
