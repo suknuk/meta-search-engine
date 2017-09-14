@@ -139,7 +139,6 @@ if (!$content_type_is_acceptable) {
         CURLOPT_USERAGENT => $SERVER_NAME,
       ));
     $json_string = curl_exec($curl);
-    curl_close($curl);
     if ($json_string) {
       $json = json_decode($json_string, true);
       if (isset($json['data'])) {
@@ -152,6 +151,7 @@ if (!$content_type_is_acceptable) {
                 ' Error: "'.curl_error($curl).'"'.
                 ' - Code: ' . curl_errno($curl));
     }
+    curl_close($curl);
   }
 
   $response = array(
