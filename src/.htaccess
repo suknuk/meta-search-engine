@@ -5,6 +5,3 @@
 #
 # from https://stackoverflow.com/a/21844345/1320237
 SetEnv no-gzip 1
-
-# from https://bz.apache.org/bugzilla/show_bug.cgi?id=42608#c5
-LogFormat "%h %l %u %t \"%r\" %>s %b %{content-length}i"

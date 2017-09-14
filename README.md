@@ -99,9 +99,29 @@ Installation
    ```
    Now, you should be able to access http://localhost/v1/search
 
+Docker
+------
 
+You can install docker.
 
+    wget -O- https://get.docker.com | sh
+    sudo usermod -aG docker $USER
+ 
+To enable that you do not need `sudo` to run the docker containers,
+log in and out.
 
+Once you installed docker, you can create a new `schulcloud/meta-search-engine`
+container like this:
+
+    docker build -t schulcloud/meta-search-engine .
+
+Then, you can run the container and map the http port to port 8000.
+
+    docker run --rm -p 8000:80 schulcloud/meta-search-engine
+
+Now, you should be able to request a search:
+
+    curl -i 'http://localhost:8000/?Q=einstein'
 
 [issue]: https://github.com/schul-cloud/schulcloud-content/issues/2
 [install-apache]: http://www.allaboutlinux.eu/how-to-run-php-on-ubuntu/
