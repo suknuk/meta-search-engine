@@ -9,6 +9,7 @@
 
 $SERVER_NAME = 'schul-cloud-meta-search-engine';
 $SEARCH_QUERY_PARAMETER_START = 'Search';
+$TIMEOUT_IN_MILLISECONDS = 500;
 
 header('Content-Type: application/vnd.api+json');
 
@@ -38,10 +39,6 @@ if (isset($_SERVER['HTTP_ACCEPT'])) {
   $content_type_is_acceptable = false;
   error_log("Accept header not set");
 }
-
-# get the default search engines to request
-$additional_search_engine_configuration = file_get_contents('./search-engines.txt');
-$default_requested_search_engines = preg_split ('/$\R?^/m', $additional_search_engine_configuration); # https://stackoverflow.com/a/7498886/1320237
 
 # find out if the request parameters are valid are usable
 $parameters_are_valid = isset($_GET['Q']);
@@ -76,7 +73,13 @@ foreach ($_GET as $key => $value) {
   }
 }
 if ($use_default_search_engines) {
-  $requested_search_engines = array_merge($requested_search_engines, $default_requested_search_engines);
+  # get the default search engines to request
+  $additional_search_engine_configuration = file_get_contents('./search-engines.txt');
+  $default_requested_search_engines = preg_split ('/$\R?^/m', $additional_search_engine_configuration); # https://stackoverflow.com/a/7498886/1320237
+
+  foreach($default_requested_search_engines as $search_engine) {
+    array_push($requested_search_engines, trim($search_engine));
+  }  
 }
 
 # set the jsonapi specification
@@ -137,6 +140,7 @@ if (!$content_type_is_acceptable) {
         CURLOPT_RETURNTRANSFER => 1,
         CURLOPT_URL => $search_url,
         CURLOPT_USERAGENT => $SERVER_NAME,
+        CURLOPT_TIMEOUT_MS => $TIMEOUT_IN_MILLISECONDS,
       ));
     $json_string = curl_exec($curl);
     if ($json_string) {
