@@ -6,6 +6,8 @@
 #
 #
 
+$SERVER_NAME = 'schul-cloud-meta-search-engine';
+
 header('Content-Type: application/vnd.api+json');
 
 # compute the host of this server
@@ -18,18 +20,7 @@ if (isset($_SERVER['HTTP_HOST'])) {
 # set the url of the search
 $HERE = 'http://'.$host.'/v1/search/';
 
-# set the jsonapi specification
-# this is part of every response
-$JSONAPI = array(
-  'version' => '1.0',
-  'meta' => array(
-    'name' => 'schul-cloud-meta-search-engine',
-    'source' => $HERE.'source.php',
-    'description' => 'This is a meta search engine which unites other search engines.'
-  )
-);
-
-# find out if the requested ocntent type is supported
+# find out if the requested content type is supported
 if (isset($_SERVER['HTTP_ACCEPT'])) {
   error_log("Accept header set to ".$_SERVER['HTTP_ACCEPT']);
   $accepted_content_types = explode(',', $_SERVER['HTTP_ACCEPT']);
@@ -47,7 +38,36 @@ if (isset($_SERVER['HTTP_ACCEPT'])) {
 }
 
 # find out if the request parameters are valid are usable
-$parameters_are_valid = isset($_GET['Q']) && count($_GET) == 1;
+$parameters_are_valid = isset($_GET['Q']);
+$invalid_parameter_message = 'You can use the "Search" parameter to set the search engines to request. ';
+if (!$parameters_are_valid) {
+  $invalid_parameter_message = $invalid_parameter_message.'Parameter "Q" must be set. ';
+}
+$requested_search_engines = array();
+foreach ($_GET as $key => $value) {
+  if ($key == 'Q') {
+    # Q parameter is supported as is
+    $Q = $value;
+  } else if ($key == 'Search') {
+    array_push($requested_search_engines, $value);
+  } else {
+    $invalid_parameter_message = $invalid_parameter_message.
+                                 'Parameter "'.$key.'" is not supported. ';
+    $parameters_are_valid = false;
+  }
+}
+
+# set the jsonapi specification
+# this is part of every response
+$JSONAPI = array(
+  'version' => '1.0',
+  'meta' => array(
+    'name' => $SERVER_NAME,
+    'source' => $HERE.'source.php',
+    'description' => 'This is a meta search engine which unites other search engines.',
+    'requested-search-engines' => $requested_search_engines,
+  )
+);
 
 # answer the request
 if (!$content_type_is_acceptable) {
@@ -63,7 +83,7 @@ if (!$content_type_is_acceptable) {
     )
   );
   http_response_code(406);
-  echo json_encode($response);
+  echo json_encode($response, JSON_PRETTY_PRINT);
 } else if (!$parameters_are_valid) {
   # we can not serve this request with invalid parameters
   $response = array(
@@ -72,23 +92,53 @@ if (!$content_type_is_acceptable) {
       array(
         'status' => '400',
         'title' => 'Bad Request',
-        'detail' => 'Currently, only the "Q" parameter is supported.'
+        'detail' => $invalid_parameter_message
       )
     )
   );
   http_response_code(400);
-  echo json_encode($response);
+  echo json_encode($response, JSON_PRETTY_PRINT);
 } else {
   # This is a proper response
   $Q = $_GET['Q'];
-  
+  $Q_encoded = urlencode($Q);
+
+  $data = array();
+  foreach($requested_search_engines as $search_engine_url) {
+    $search_url = $search_engine_url."?Q=".$Q_encoded;
+    # see these posts for how to use curl
+    #    https://stackoverflow.com/a/959072/1320237
+    #    http://codular.com/curl-with-php
+    error_log('requesting '.$search_url);
+    $curl = curl_init();
+    curl_setopt_array($curl, array(
+        CURLOPT_RETURNTRANSFER => 1,
+        CURLOPT_URL => $search_url,
+        CURLOPT_USERAGENT => $SERVER_NAME,
+      ));
+    $json_string = curl_exec($curl);
+    curl_close($curl);
+    if ($json_string) {
+      $json = json_decode($json_string, true);
+      if (isset($json['data'])) {
+        $data = array_merge($data, $json['data']);
+      } else {
+        error_log('Could not find "data" field in response from "'.$search_url.'".');
+      }
+    } else {
+      error_log('Could not request '.$search_url.
+                ' Error: "'.curl_error($curl).'"'.
+                ' - Code: ' . curl_errno($curl));
+    }
+  }
+
   $response = array(
     'jsonapi' => $JSONAPI,
     'links' => array(
       'self' => array(
-        'href' => $HERE.'?Q='.$Q,
+        'href' => $HERE.'?Q='.$Q_encoded,
         'meta' => array(
-          'count' => 0,
+          'count' => count($data),
           'limit' => 10,
           'offset' => 0,
         )
@@ -98,9 +148,9 @@ if (!$content_type_is_acceptable) {
       'prev' => null,
       'next' => null
     ),
-    'data' => array(),
+    'data' => $data,
   );
-  echo json_encode($response);
+  echo json_encode($response, JSON_PRETTY_PRINT);
 }
 
 # finish the response

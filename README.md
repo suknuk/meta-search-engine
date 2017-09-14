@@ -52,7 +52,8 @@ Installation
    ```
    Check that http://localhost returns a webpage.
    ```
-   sudo apt-get -y install php libapache2-mod-php
+   sudo apt-get -y install libapache2-mod-php curl \
+                           libcurl3 libcurl3-dev php-curl
    ```
  - Get this repository.  
    You can download the sources or clone it usig git.
