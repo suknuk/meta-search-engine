@@ -7,7 +7,7 @@ search_engines="/var/www/html/search-engines.txt"
 echo -n > "$search_engines"
 
 while [ -n "$1" ]; do
-  echo "$1" > "$search_engines"
+  echo "$1" >> "$search_engines"
   echo "Adding search engine \"$1\"."
   shift
 done

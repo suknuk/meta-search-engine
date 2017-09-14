@@ -7,9 +7,19 @@
 # The configuration for search engines can be found here in
 # ./search-engines.txt
 
+####################################################
+# constants
 $SERVER_NAME = 'schul-cloud-meta-search-engine';
 $SEARCH_QUERY_PARAMETER_START = 'Search';
 $TIMEOUT_IN_MILLISECONDS = 500;
+
+####################################################
+# definitions
+
+
+####################################################
+# request handling
+
 
 header('Content-Type: application/vnd.api+json');
 
@@ -129,12 +139,17 @@ if (!$content_type_is_acceptable) {
   $Q_encoded = urlencode($Q);
 
   $data = array();
+  # create curl requests
+  $curls = array();
   foreach($requested_search_engines as $search_engine_url) {
     $search_url = $search_engine_url."?Q=".$Q_encoded;
     # see these posts for how to use curl
     #    https://stackoverflow.com/a/959072/1320237
     #    http://codular.com/curl-with-php
-    error_log('requesting '.$search_url);
+    #
+    # here is an example for parallel handling of curls
+    #    https://nic3.de/php/curl-multi
+    error_log('Configuring '.$search_url);
     $curl = curl_init();
     curl_setopt_array($curl, array(
         CURLOPT_RETURNTRANSFER => 1,
@@ -142,7 +157,27 @@ if (!$content_type_is_acceptable) {
         CURLOPT_USERAGENT => $SERVER_NAME,
         CURLOPT_TIMEOUT_MS => $TIMEOUT_IN_MILLISECONDS,
       ));
-    $json_string = curl_exec($curl);
+    array_push($curls, $curl);
+  }
+
+  # request curl in parallel
+  $multi_curl=curl_multi_init();
+  foreach($curls as $curl)
+  {
+	  curl_multi_add_handle($multi_curl, $curl);
+  }
+  do
+  {
+	  usleep(10000);
+	  curl_multi_exec($multi_curl, $running);
+  }
+  while($running > 0);
+
+  # collect the results
+  foreach($curls as $id => $curl)
+  {
+    error_log('Collecting search results from "'.$requested_search_engines[$id].'"');
+    $json_string = curl_multi_getcontent($curl);
     if ($json_string) {
       $json = json_decode($json_string, true);
       if (isset($json['data'])) {
@@ -155,6 +190,7 @@ if (!$content_type_is_acceptable) {
                 ' Error: "'.curl_error($curl).'"'.
                 ' - Code: ' . curl_errno($curl));
     }
+	  curl_multi_remove_handle($multi_curl,$curl);
     curl_close($curl);
   }
 
