@@ -36,9 +36,38 @@ docker run schulcloud/meta-search-engine --url http://localhost:8080 --url http:
 Now, if you request a search for Einstein at http://localhost:9999/v1/search?Q=Einstein, you should see your
 results along the other results.
 
-Likewise, if you install the seach engine locally, you can use the local installation to run the search:
+Likewise, if you install the seach engine locally,
+you can edit the [search-engines.txt][list] file.
+Each line contains a search engine.
 
-    schul-cloud-meta-search-engine --url http://localhost:8080 --url http://search.schul-cloud.org --port 9999
+
+Query
+-----
+
+If you run the search engine, you can also specify which search engines should
+be requested.
+If a usual query looks like `Q=einstein`, a query requesting an additional
+search engine running under http://localhost:8080/v1/search looks like
+`Q=einstein&Search=http://localhost:8080/v1/search`.
+
+You can request several additional search engines by adding a number behind
+the `Search` parameter:
+
+    Q=einstein
+    Q=einstein&Search1=http://localhost:8080/v1/search
+    Q=einstein&Search1=http://localhost:8080/v1/search&Search2=http://localhost:8080/v1/search
+    ...
+
+If you do not like to request the default search engines,
+you can use the `Default=false` parameter.
+Then, only the search engines passed with `Search` query parameters are
+requested.
+
+- `Q=einstein` will request all search engines in the
+  [search engine listing][list].
+- `Q=einstein&Default=false` will request no search engine.
+  
+
 
 Installation
 ------------
@@ -76,3 +105,4 @@ Installation
 
 [issue]: https://github.com/schul-cloud/schulcloud-content/issues/2
 [install-apache]: http://www.allaboutlinux.eu/how-to-run-php-on-ubuntu/
+[list]: src/search-engines.txt

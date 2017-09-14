@@ -7,6 +7,7 @@
 #
 
 $SERVER_NAME = 'schul-cloud-meta-search-engine';
+$SEARCH_QUERY_PARAMETER_START = 'Search';
 
 header('Content-Type: application/vnd.api+json');
 
@@ -48,7 +49,7 @@ foreach ($_GET as $key => $value) {
   if ($key == 'Q') {
     # Q parameter is supported as is
     $Q = $value;
-  } else if ($key == 'Search') {
+  } else if (substr($key, 0, strlen($SEARCH_QUERY_PARAMETER_START)) === $SEARCH_QUERY_PARAMETER_START) {
     array_push($requested_search_engines, $value);
   } else {
     $invalid_parameter_message = $invalid_parameter_message.
