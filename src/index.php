@@ -41,7 +41,7 @@ if (isset($_SERVER['HTTP_ACCEPT'])) {
 
 # get the default search engines to request
 $additional_search_engine_configuration = file_get_contents('./search-engines.txt');
-$requested_search_engines = preg_split ('/$\R?^/m', $additional_search_engine_configuration); # https://stackoverflow.com/a/7498886/1320237
+$default_requested_search_engines = preg_split ('/$\R?^/m', $additional_search_engine_configuration); # https://stackoverflow.com/a/7498886/1320237
 
 # find out if the request parameters are valid are usable
 $parameters_are_valid = isset($_GET['Q']);
@@ -51,17 +51,32 @@ if (!$parameters_are_valid) {
 }
 
 # parse the request parameters
+$requested_search_engines = array();
+$use_default_search_engines = true;
 foreach ($_GET as $key => $value) {
   if ($key == 'Q') {
     # Q parameter is supported as is
     $Q = $value;
   } else if (substr($key, 0, strlen($SEARCH_QUERY_PARAMETER_START)) === $SEARCH_QUERY_PARAMETER_START) {
     array_push($requested_search_engines, $value);
+  } else if ($key == 'Default') {
+    if ($value == 'false') {
+      $use_default_search_engines = false;
+    } else {
+      $invalid_parameter_message = $invalid_parameter_message.
+                                   'The "Default" parameter can '.
+                                   'only have the value "false" '.
+                                   'but is set to "'.$value.'". ';
+      $parameters_are_valid = false;
+    }
   } else {
     $invalid_parameter_message = $invalid_parameter_message.
                                  'Parameter "'.$key.'" is not supported. ';
     $parameters_are_valid = false;
   }
+}
+if ($use_default_search_engines) {
+  $requested_search_engines = array_merge($requested_search_engines, $default_requested_search_engines);
 }
 
 # set the jsonapi specification
