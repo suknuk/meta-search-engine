@@ -1,6 +1,9 @@
 meta-search-engine
 ==================
 
+[![Build Status](https://travis-ci.org/schul-cloud/meta-search-engine.svg?branch=master)](https://travis-ci.org/schul-cloud/meta-search-engine)
+[![Docker Build Status](https://img.shields.io/docker/build/jrottenberg/ffmpeg.svg)](https://hub.docker.com/r/schulcloud/meta-search-engine/builds/)
+
 This is a meta search engine to join the forces of several Schul-Cloud search engines.
 
 This is part of the minimal working prototype.
