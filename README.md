@@ -1,6 +1,10 @@
 meta-search-engine
 ==================
 
+[![Build Status](https://travis-ci.org/schul-cloud/meta-search-engine.svg?branch=master)](https://travis-ci.org/schul-cloud/meta-search-engine)
+[![Docker Build Status](https://img.shields.io/docker/build/jrottenberg/ffmpeg.svg)](https://hub.docker.com/r/schulcloud/meta-search-engine/builds/)
+ [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+
 This is a meta search engine to join the forces of several Schul-Cloud search engines.
 
 This is part of the minimal working prototype.
