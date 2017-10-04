@@ -1,22 +1,24 @@
+sudo: required
+
 language: php
 php:
   - '7.0'
 
+services:
+- docker
+
+before_install:
+  - docker build -t schulcloud/meta-search-engine .
+  - docker run -d -p 8000:80 --name meta-search-engine-container schulcloud/meta-search-engine
+
 before_script:
   # install packages
   - sudo apt-get update -qq
-  - sudo apt-get install -y -qq python3 python3-pip apache2
-  - pip3 install --user schul_cloud_search_tests
-  # install current search engine
-  - sudo mkdir -p /var/www/html/v1
-  - sudo ln -sT "`pwd`/src" /var/www/html/v1/search
-  # restart apache
-  - sudo service apache2 restart
+  - sudo apt-get install -y -qq python3 python3-pip
+  - pip3 install --user schul-cloud-search-tests
 
 script:
-  - "curl -i -H 'User-Agent: python-requests/2.18.1' -H 'Accept-Encoding: gzip, deflate' -H 'Host: localhost:37325' -H 'Accept: */*' 'http://localhost/v1/search/?Q=test'"
-  - "python3 -m schul_cloud_search_tests.search --url=http://localhost/v1/search/"
+  - "curl -i -H 'User-Agent: python-requests/2.18.1' -H 'Accept-Encoding: gzip, deflate' -H 'Host: localhost:37325' -H 'Accept: */*' 'http://localhost:8000/?Q=test'"
+  - "python3 -m schul_cloud_search_tests.search --url=http://localhost:8000/"
 
-after_failure:
-  - sudo cat /var/log/apache2/access.log
-  - sudo cat /var/log/apache2/error.log
+
