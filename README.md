@@ -35,7 +35,7 @@ official Schul-Cloud search. Your search engine runs on http://localhost:8080 an
 Schul-Cloud search runs at http://search.schul-cloud.org.
 You can run the docker-container at port 9999.
 ```
-docker run schulcloud/meta-search-engine --url http://localhost:8080 --url http://search.schul-cloud.org --port 9999
+docker run -p 9999:80 schulcloud/meta-search-engine http://localhost:8080 http://search.schul-cloud.org
 ```
 Now, if you request a search for Einstein at http://localhost:9999/v1/search?Q=Einstein, you should see your
 results along the other results.
