@@ -21,4 +21,7 @@ script:
   - "curl -i -H 'User-Agent: python-requests/2.18.1' -H 'Accept-Encoding: gzip, deflate' -H 'Host: localhost:37325' -H 'Accept: */*' 'http://localhost:8000/?Q=test'"
   - "python3 -m schul_cloud_search_tests.search --url=http://localhost:8000/"
 
+after_failure:
+  - docker logs meta-search-engine-container
+
 
