@@ -5,6 +5,7 @@ meta-search-engine
 [![Docker Build Status](https://img.shields.io/docker/build/schulcloud/meta-search-engine.svg)](https://hub.docker.com/r/schulcloud/meta-search-engine/builds/)
 
 This is a meta search engine to join the forces of several Schul-Cloud search engines.
+The meta-search-engine is part of a [greater project][project] to scale up the content search and [this issue][issue] is the reason why it was created.
 
 This is part of the minimal working prototype.
 This README file must explain, 
@@ -129,3 +130,5 @@ Now, you should be able to request a search:
 [issue]: https://github.com/schul-cloud/schulcloud-content/issues/2
 [install-apache]: http://www.allaboutlinux.eu/how-to-run-php-on-ubuntu/
 [list]: src/search-engines.txt
+[project]: https://github.com/schul-cloud/schulcloud-content/projects/1
+[issue]: https://github.com/schul-cloud/schulcloud-content/issues/2
